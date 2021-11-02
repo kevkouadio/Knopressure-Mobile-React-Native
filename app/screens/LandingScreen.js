@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View, Image, Button } from 'react-native';
 
-export default function Landing() {
+export default function LandingScreen({navigation}) {
   return (
     
     <View style={styles.container}>
@@ -22,7 +22,7 @@ export default function Landing() {
             <View>
                 <Text style={styles.row}>Use our app to track your Blood Pressure.</Text>
             </View>
-            <Button title="Login"/>
+            <Button title="Login" onPress={() =>navigation.navigate('Login', { name: 'Login' })} />
             <Button title="SignUp"/>
         <StatusBar style="auto" />
         </View>
