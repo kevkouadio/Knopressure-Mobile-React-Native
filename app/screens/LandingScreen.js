@@ -23,7 +23,7 @@ export default function LandingScreen({navigation}) {
                 <Text style={styles.row}>Use our app to track your Blood Pressure.</Text>
             </View>
             <Button title="Login" onPress={() =>navigation.navigate('Login', { name: 'Login' })} />
-            <Button title="SignUp"/>
+            <Button title="SignUp"onPress={() =>navigation.navigate('SignUp', { name: 'SignUp' })}/>
         <StatusBar style="auto" />
         </View>
     </View>
