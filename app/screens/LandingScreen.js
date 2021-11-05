@@ -24,6 +24,7 @@ export default function LandingScreen({navigation}) {
             </View>
             <Button title="Login" onPress={() =>navigation.navigate('Login', { name: 'Login' })} />
             <Button title="SignUp"onPress={() =>navigation.navigate('SignUp', { name: 'SignUp' })}/>
+            <Button title="Home"onPress={() =>navigation.navigate('Home', { name: 'Home' })}/>
         <StatusBar style="auto" />
         </View>
     </View>
