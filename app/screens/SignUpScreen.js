@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { TouchableOpacity, StyleSheet, View } from 'react-native'
+import { TouchableOpacity, StyleSheet, View, Image } from 'react-native'
 import { Text } from 'react-native-paper'
 // import Background from '../components/Background'
 // import Logo from '../components/Logo'
@@ -49,6 +49,7 @@ export default function RegisterScreen({ navigation }) {
       {/* <BackButton goBack={navigation.goBack} /> */}
       {/* <Logo /> */}
       {/* <Header>Welcome back.</Header> */}
+      <Image source={require('../assets/logo.jpg')} style={styles.image} />
       <TextInput
         label="Name"
         returnKeyType="next"
@@ -137,6 +138,11 @@ const styles = StyleSheet.create({
         margin: 12,
         borderWidth: 1,
         padding: 10,
+      },
+    image: {
+        width: 120,
+        height: 120,
+        marginBottom: 20,
       },
     wrapper: {
         borderColor: 'grey',
