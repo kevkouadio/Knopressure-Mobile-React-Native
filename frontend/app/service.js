@@ -1,25 +1,38 @@
 import axios from 'axios';
+import jwtDecode from 'jwt-decode';
+import * as SecureStore from 'expo-secure-store';
 
 const service = axios.create({
   baseURL: 'http://10.0.0.137:3000', // backend server URL
 });
 
 const signup = (user) => service.post('/signup', user);
-const login = (user) => service.post('/login', user);
 
-export { signup, login };
+const login = (user) => service.post('/login', user).then((response) => {
+  const { token } = response.data;
+  SecureStore.setItemAsync('token', token);
+  return token;
+});
 
-//import axios from 'axios';
+const getUserProfile = async () => {
+  try {
+    const token = await SecureStore.getItemAsync('token');
+    const { id: userId } = jwtDecode(token);
+    //console.log(userId)
+    const response = await service.get(`/user/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    //console.log(response.data)
+    //console.error(error.message);
+    console.error(error.response.status);
+    // const token = await SecureStore.getItemAsync('token');
+    // console.log(jwtDecode(token))
+    //console.error(error.response.data);
+  }
+};
 
-// const backend_URL = "https://data.mongodb-api.com/app/data-dwhpj/endpoint/data/v1";
-
-// export const Service = {
-//   async login(credentials) {
-//     try {
-//       const { data } = await axios.post('/login', credentials);
-//       return data;
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   },
-// };
+export { signup, login, getUserProfile };

@@ -1,16 +1,15 @@
 import React, { useState } from 'react'
 import { TouchableOpacity, StyleSheet, View, Image } from 'react-native'
 import { Text } from 'react-native-paper'
-// import Background from '../components/Background'
-// import Logo from '../components/Logo'
-// import Header from '../components/Header'
 import Button from '../components/Button'
 import TextInput from '../components/TextInput'
 import BackButton from '../components/BackButton'
 import { theme } from '../core/theme'
 import { emailValidator } from '../helpers/emailValidator'
 import { passwordValidator } from '../helpers/passwordValidator'
-import { login } from '../service' //import the service
+import { login, getUserProfile } from '../service' //import the service
+//import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as SecureStore from 'expo-secure-store';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState({ value: '', error: '' })
@@ -27,22 +26,28 @@ export default function LoginScreen({ navigation }) {
     }
     try {
       const response = await login({ email: email.value, password: password.value });
-      if (response.status === 200) {
-          alert("login success!")
-          setErrorMessage("")
-          // navigate to the dashboard or the intended screen
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Home' }],
-          })
+      console.log('Response from server: ', response);
+      if (response) {
+        // store the token in async-storage
+        await SecureStore.setItemAsync('token', response);
+        //console.log("this is response.token", response.token)
+        setErrorMessage("")
+        //console.log('Token value: ', token);
+        // navigate to the dashboard or the intended screen
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        })
       } else {
-          alert("login failed!")
+        console.error('Token not found in response: ', response);
+        setErrorMessage("can't login, please check your credentials!")
       }
-  } catch (error) {
-      console.log(error.message)
+    } catch (error) {
+      console.error(error.message)
       setErrorMessage("can't login, please check your credentials!")
+    }
   }
-}
+  
   return (
     <View style={styles.container}>
         {/* <View style={styles.wrapper}> */}

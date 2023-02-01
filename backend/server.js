@@ -3,12 +3,12 @@ const app = express();
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
-var cors = require('cors')
+var cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-app.use(cors())
+app.use(cors());
 app.use(bodyParser.json());
-//app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const uri = process.env.DB_CONNECTION;
@@ -22,6 +22,7 @@ const UserSchema = new mongoose.Schema({
 const User = mongoose.model('users', UserSchema);
 
 const saltRounds = 10;
+const secret = process.env.JWT_SECRET;
 
 app.post('/signup', async (req, res) => {
     try {
@@ -48,7 +49,10 @@ app.post('/login', (req, res) => {
                 return res.status(500).send(err);
             }
             if (!result) return res.status(401).send("Wrong password.");
-            res.status(200).send(user);
+
+            const token = jwt.sign({ id: user._id }, secret, { expiresIn: '24h' });
+            //res.header('auth-token', token);
+            res.status(200).json({ token });
         });
     });
 });
@@ -62,6 +66,32 @@ app.get('/users', (req, res) => {
     });
 });
 
+app.get('/user/:id', (req, res) => {
+    const userId = req.params.id;
+    User.findById(userId, (err, user) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      if (!user) {
+        return res.status(404).send({ message: 'User not found' });
+      }
+      res.status(200).json(user);
+    });
+  });
+
+app.use((req, res, next) => {
+    const token = req.header('auth-token');
+    console.log("token", token);
+    if (!token) return res.status(401).send('Access Denied');
+    try {
+        const verified = jwt.verify(token, secret);
+        req.user = verified;
+        next();
+    } catch (err) {
+        res.status(400).send('Invalid Token');
+    }
+});
+  
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })

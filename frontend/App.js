@@ -1,15 +1,18 @@
-import React from 'react';
+import React , { useEffect } from 'react';
 import LandingScreen from './app/screens/LandingScreen';
 import LoginScreen from './app/screens/LoginScreen';
 import SignUpScreen from './app/screens/SignUpScreen';
 import HomeTabs from './app/screens/HomeScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
+import * as SecureStore from 'expo-secure-store';
+import { useNavigation } from '@react-navigation/native';
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {
+const App = () => {
+  
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -21,3 +24,4 @@ export default function App() {
     </NavigationContainer>
   );
 };
+export default App
