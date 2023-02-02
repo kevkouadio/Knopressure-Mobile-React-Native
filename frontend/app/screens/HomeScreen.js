@@ -10,7 +10,7 @@ import TextInput from '../components/TextInput'
 import Button from '../components/Button'
 import Tables from '../components/Table';
 import * as SecureStore from 'expo-secure-store';
-import { getUserProfile } from '../service';
+import { getUserProfile, createBpData } from '../service';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,13 +23,9 @@ function HomeScreen({ navigation, userId }) {
     getUserProfile(userId)
       .then((response) => {
         setUser(response);
-        //console.log(response);
-        //setLoading(false);
       })
       .catch((error) => {
         console.error(error);
-        // console.error(error.response.status);
-        // console.error(error.response.data);
       });
   }, [userId]);
 
@@ -40,6 +36,23 @@ function HomeScreen({ navigation, userId }) {
         index: 0,
         routes: [{ name: 'Landing' }],
       });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const createNewBpData = async () => {
+    try {
+      const bpData = {
+        Systolic: systolic.value,
+        Diastolic: diastolic.value,
+        userID: user.id
+      };
+      const response = await createBpData(bpData);
+      alert("BP data saved!");
+      setSystolic({ value: '' });
+      setDiastolic({ value: '' });
+      console.log(response);
     } catch (error) {
       console.error(error);
     }
@@ -64,12 +77,12 @@ function HomeScreen({ navigation, userId }) {
             returnKeyType="next"
             value={systolic.value}
             onChangeText={(text) => setSystolic({ value: text, error: '' })}
-            // error={!!email.error}
-            // errorText={email.error}
             autoCapitalize="none"
-            // autoCompleteType="email"
-            // textContentType="emailAddress"
             keyboardType="numeric"
+            onSubmitEditing={() => {
+              //createNewBpData({ systolic: systolic.value, diastolic: diastolic.value });
+              //setSystolic({ value: '' });
+            }}
           />
 
           <View>
@@ -81,10 +94,11 @@ function HomeScreen({ navigation, userId }) {
             returnKeyType="done"
             value={diastolic.value}
             onChangeText={(text) => setDiastolic({ value: text, error: '' })}
-            // error={!!password.error}
-            // errorText={password.error}
-            // secureTextEntry
             keyboardType="numeric"
+            onSubmitEditing={() => {
+              //createNewBpData({ systolic: systolic.value, diastolic: diastolic.value });
+              //setDiastolic({ value: '' });
+            }}
           />
         </View>
         {/* <Tables />  */}
@@ -94,7 +108,7 @@ function HomeScreen({ navigation, userId }) {
           style={styles.image}
         />
 
-        <Button style={styles.Button} mode="contained" disabled={!(systolic.value && diastolic)}>
+        <Button style={styles.Button} mode="contained" onPress={createNewBpData} disabled={!(systolic.value && diastolic)}>
           Submit your numbers
         </Button>
       </View>

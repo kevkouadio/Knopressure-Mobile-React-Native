@@ -21,6 +21,14 @@ const UserSchema = new mongoose.Schema({
 });
 const User = mongoose.model('users', UserSchema);
 
+const bpSchema = new mongoose.Schema({
+    userID: { type: String, required: true },
+    Systolic: { type: Number, required: true },
+    Diastolic: { type: Number, required: true },
+    date: { type: Date, default: Date.now },
+});
+const BPData = mongoose.model('bpdatas', bpSchema);
+
 const saltRounds = 10;
 const secret = process.env.JWT_SECRET;
 
@@ -79,7 +87,7 @@ app.get('/user/:id', (req, res) => {
     });
   });
 
-app.use((req, res, next) => {
+  app.use((req, res, next) => {
     const token = req.header('auth-token');
     console.log("token", token);
     if (!token) return res.status(401).send('Access Denied');
@@ -91,6 +99,68 @@ app.use((req, res, next) => {
         res.status(400).send('Invalid Token');
     }
 });
+
+// get all bp data
+app.get("/bp", async (req, res) => {
+    try {
+      const bpData = await BPData.find({ userID: req.user.id });
+      //console.log(req.user.id)
+      res.status(200).json(bpData);
+    } catch (error) {
+      console.log(error);
+      res.status(400).send(error.message);
+    }
+  });
+  
+  
+  // create a single new data
+  app.post("/bp", async (req, res) => {
+    try {
+    const bpData = await BPData.create({ ...req.body, userID: req.user.id });
+      res.json(bpData);
+    } catch (error) {
+      console.log(error);
+      res.status(400).send(error.message);
+      n;
+    }
+  });
+  
+  // read one task by data id
+  app.get("/bp/:id", async (req, res) => {
+    try {
+        const bpData = await BPData.findById({ _id: req.params.id });
+      res.json(bpData);
+    } catch (error) {
+      console.log(error);
+      res.status(400).send(error.message);
+    }
+  });
+  
+  // Update one data by id
+  app.put("/bp/:id", async (req, res) => {
+    try {
+        const bpData = await BPData.findOneAndUpdate(
+        { _id: req.params.id },
+        req.body
+      );
+      res.json(bpData);
+    } catch (error) {
+      console.log(error);
+      res.status(400).send(error.message);
+    }
+  });
+  
+  // delete one data by task id
+  app.delete("/bp/:id", async (req, res) => {
+    try {
+      const bpData = await BPData.remove({ _id: req.params.id });
+      res.json(bpData);
+    } catch (error) {
+      console.log(error);
+      res.status(400).send(error.message);
+    }
+  });
+
   
 app.get('/', (req, res) => {
     res.send('Hello World!')

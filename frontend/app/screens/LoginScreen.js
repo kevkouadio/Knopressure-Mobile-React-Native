@@ -26,9 +26,9 @@ export default function LoginScreen({ navigation }) {
     }
     try {
       const response = await login({ email: email.value, password: password.value });
-      console.log('Response from server: ', response);
+      //console.log('Response from server: ', response);
       if (response) {
-        // store the token in async-storage
+        // store the token in SecureStore
         await SecureStore.setItemAsync('token', response);
         //console.log("this is response.token", response.token)
         setErrorMessage("")
@@ -39,7 +39,7 @@ export default function LoginScreen({ navigation }) {
           routes: [{ name: 'Home' }],
         })
       } else {
-        console.error('Token not found in response: ', response);
+        //console.error('Token not found in response: ', response);
         setErrorMessage("can't login, please check your credentials!")
       }
     } catch (error) {

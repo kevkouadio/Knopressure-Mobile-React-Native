@@ -11,7 +11,7 @@ export default function LandingScreen({ navigation }) {
   useEffect(() => {
       const bootstrapAsync = async () => {
         const token = await SecureStore.getItemAsync('token');
-        console.log(token)
+        //console.log(token)
         if (token) {
           navigation.reset({
             index: 0,
