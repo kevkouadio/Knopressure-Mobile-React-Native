@@ -79,10 +79,6 @@ function HomeScreen({ navigation, userId }) {
             onChangeText={(text) => setSystolic({ value: text, error: '' })}
             autoCapitalize="none"
             keyboardType="numeric"
-            onSubmitEditing={() => {
-              //createNewBpData({ systolic: systolic.value, diastolic: diastolic.value });
-              //setSystolic({ value: '' });
-            }}
           />
 
           <View>
@@ -95,10 +91,6 @@ function HomeScreen({ navigation, userId }) {
             value={diastolic.value}
             onChangeText={(text) => setDiastolic({ value: text, error: '' })}
             keyboardType="numeric"
-            onSubmitEditing={() => {
-              //createNewBpData({ systolic: systolic.value, diastolic: diastolic.value });
-              //setDiastolic({ value: '' });
-            }}
           />
         </View>
         {/* <Tables />  */}
@@ -138,7 +130,8 @@ export default function HomeTabs() {
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="chart-line" color={color} size={26} />
           ),
-          headerShown: false
+          headerShown: false,
+          orientation: 'landscape'
         }}
       />
       <Tab.Screen name="Tips" component={TipsScreen}
@@ -193,7 +186,7 @@ const styles = StyleSheet.create({
 
   slash: {
     fontWeight: 'bold',
-    fontSize: '70',
+    fontSize: 70,
     margin: 'auto',
   },
   image: {

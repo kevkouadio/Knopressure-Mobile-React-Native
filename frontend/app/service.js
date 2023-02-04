@@ -14,9 +14,31 @@ const login = (user) => service.post('/login', user).then((response) => {
   return token;
 });
 
+const refreshToken = async () => {
+  try {
+    const token = await SecureStore.getItemAsync('token');
+    const { id: userId } = jwtDecode(token);
+    const response = await service.get(`/refreshToken/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const newToken = response.data.token;
+    SecureStore.setItemAsync('token', newToken);
+    return newToken;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const getUserProfile = async () => {
   try {
     const token = await SecureStore.getItemAsync('token');
+    const decoded = jwtDecode(token);
+    // check if the token has expired
+    if (decoded.exp * 1000 < Date.now()) {
+      await refreshToken();
+    }
     const { id: userId } = jwtDecode(token);
     //console.log(userId)
     const response = await service.get(`/user/${userId}`, {
@@ -26,18 +48,18 @@ const getUserProfile = async () => {
     });
     return response.data;
   } catch (error) {
-    //console.log(response.data)
-    //console.error(error.message);
     console.error(error.response.status);
-    // const token = await SecureStore.getItemAsync('token');
-    // console.log(jwtDecode(token))
-    //console.error(error.response.data);
   }
 };
 
 const getAllBPData = async () => {
   try {
     const token = await SecureStore.getItemAsync('token');
+    // check if the token has expired
+    const decoded = jwtDecode(token);
+    if (decoded.exp * 1000 < Date.now()) {
+      await refreshToken();
+    }
     //console.log(token)
     const response = await service.get('/bp', {
       headers: {
@@ -54,6 +76,11 @@ const getAllBPData = async () => {
 const createBpData = async (bpData) => {
   try {
     const token = await SecureStore.getItemAsync('token');
+    // check if the token has expired
+    const decoded = jwtDecode(token);
+    if (decoded.exp * 1000 < Date.now()) {
+      await refreshToken();
+    }
     const response = await service.post('/bp', bpData, {
       headers: {
         'auth-token': `${token}`
@@ -70,6 +97,11 @@ const createBpData = async (bpData) => {
 const readBpData = async (id) => {
   try {
     const token = await SecureStore.getItemAsync('token');
+    // check if the token has expired
+    const decoded = jwtDecode(token);
+    if (decoded.exp * 1000 < Date.now()) {
+      await refreshToken();
+    }
     const response = await service.get(`/bp/${id}`, {
       headers: {
         'auth-token': `${token}`
@@ -84,6 +116,11 @@ const readBpData = async (id) => {
 const updateBpData = async (id, bpData) => {
   try {
     const token = await SecureStore.getItemAsync('token');
+    // check if the token has expired
+    const decoded = jwtDecode(token);
+    if (decoded.exp * 1000 < Date.now()) {
+      await refreshToken();
+    }
     const response = await service.put(`/bp/${id}`, bpData, {
       headers: {
         'auth-token': `${token}`
@@ -98,6 +135,11 @@ const updateBpData = async (id, bpData) => {
 const deleteBpData = async (id) => {
   try {
     const token = await SecureStore.getItemAsync('token');
+    // check if the token has expired
+    const decoded = jwtDecode(token);
+    if (decoded.exp * 1000 < Date.now()) {
+      await refreshToken();
+    }
     const response = await service.delete(`/bp/${id}`, {
       headers: {
         'auth-token': `${token}`
@@ -112,6 +154,7 @@ const deleteBpData = async (id) => {
 export {
   signup,
   login,
+  refreshToken,
   getUserProfile,
   getAllBPData,
   createBpData,

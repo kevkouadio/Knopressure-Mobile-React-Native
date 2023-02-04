@@ -65,6 +65,20 @@ app.post('/login', (req, res) => {
     });
 });
 
+app.post('/refreshToken', (req, res) => {
+    jwt.verify(req.body.token, secret, (err, decoded) => {
+      if (err) return res.status(401).send("Token is invalid.");
+  
+      User.findById(decoded.id, (err, user) => {
+        if (err) return res.status(500).send(err);
+        if (!user) return res.status(404).send("User not found.");
+  
+        const newToken = jwt.sign({ id: user._id }, secret, { expiresIn: '24h' });
+        res.status(200).json({ token: newToken });
+      });
+    });
+  });  
+
 app.get('/users', (req, res) => {
     User.find({}, (err, users) => {
         if (err) {
