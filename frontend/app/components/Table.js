@@ -50,5 +50,5 @@ const CONTENT = {
     wrapper: { flexDirection: 'row' },
     title: { flex: 1, backgroundColor: '#2ecc71'},
     row: { height: 40 },
-    text: { textAlign: 'center', fontSize: '10' },
+    text: { textAlign: 'center', fontSize: 10 },
   });

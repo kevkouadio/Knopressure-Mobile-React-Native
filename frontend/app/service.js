@@ -14,26 +14,9 @@ const login = (user) => service.post('/login', user).then((response) => {
   return token;
 });
 
-const refreshToken = async () => {
-  try {
-    const token = await SecureStore.getItemAsync('token');
-    const { id: userId } = jwtDecode(token);
-    const response = await service.get(`/refreshToken/${userId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    const newToken = response.data.token;
-    SecureStore.setItemAsync('token', newToken);
-    return newToken;
-  } catch (error) {
-    console.error(error);
-  }
-};
-
 const getUserProfile = async () => {
   try {
-    const token = await SecureStore.getItemAsync('token');
+    const token = await SecureStore.getItemAsync('token'); 
     const decoded = jwtDecode(token);
     // check if the token has expired
     if (decoded.exp * 1000 < Date.now()) {
@@ -151,14 +134,31 @@ const deleteBpData = async (id) => {
   }
 };
 
+const refreshToken = async () => {
+  try {
+    await SecureStore.deleteItemAsync('token');
+    const token = await SecureStore.getItemAsync('token');
+    const response = await service.post('/refreshToken', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const newToken = response.data.token;
+    SecureStore.setItemAsync('token', newToken); 
+    console.log(newToken);
+    return newToken;
+  } catch (error) {
+    console.error(error); 
+  }
+};
+
 export {
   signup,
   login,
-  refreshToken,
   getUserProfile,
   getAllBPData,
   createBpData,
   readBpData,
   updateBpData,
   deleteBpData
-};
+}; 

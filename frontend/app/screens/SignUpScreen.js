@@ -13,6 +13,7 @@ import { passwordValidator } from '../helpers/passwordValidator'
 import { confirmPasswordValidator } from '../helpers/confirmPasswordValidator'
 import { nameValidator } from '../helpers/nameValidator'
 import { signup } from '../service' //import the service
+import { IconButton } from 'react-native-paper';
 
 export default function RegisterScreen({ navigation }) {
   const [username, setUsername] = useState({ value: '', error: '' })
@@ -20,8 +21,10 @@ export default function RegisterScreen({ navigation }) {
   const [password, setPassword] = useState({ value: '', error: '' })
   const [confirmPassword, setConfirmPassword] = useState({ value: '', error: '' })
   const [errorMessage, setErrorMessage] = useState()
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const  onSignUpPressed = async () => {
+  const onSignUpPressed = async () => {
     const nameError = nameValidator(username.value)
     const emailError = emailValidator(email.value)
     const passwordError = passwordValidator(password.value)
@@ -33,40 +36,32 @@ export default function RegisterScreen({ navigation }) {
       setConfirmPassword({ ...confirmPassword, error: confirmPasswordError })
       return
     }
-    // if (confirmPassword.value !== password.value ) {
-    //     setConfirmPassword({ error: confirmPasswordError })
-    //     alert("Password doesn't match.")
-    // }
-      try {
-        const response = await signup({
-            username: username.value,
-            email: email.value,
-            password: password.value
+    try {
+      const response = await signup({
+        username: username.value,
+        email: email.value,
+        password: password.value
+      });
+
+      if (response.status === 201) {
+        alert("Signup success!");
+        setErrorMessage("");
+        // navigate to the login screen or the intended screen
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Login' }],
         });
-    
-        if (response.status === 201) {
-            alert("Signup success!");
-            setErrorMessage("");
-            // navigate to the login screen or the intended screen
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'Login' }],
-            });
-        } else {
-            alert("Signup failed!");
-        }
+      } else {
+        alert("Signup failed!");
+      }
     } catch (error) {
-        console.log(error.message);
-        setErrorMessage("can't signup? make sure don't have an account already!");
+      console.log(error.message);
+      setErrorMessage("can't signup? make sure don't have an account already!");
     }
   }
 
   return (
     <View style={styles.container}>
-        {/* <View style={styles.wrapper}> */}
-      {/* <BackButton goBack={navigation.goBack} /> */}
-      {/* <Logo /> */}
-      {/* <Header>Welcome back.</Header> */}
       <Image source={require('../assets/logo.jpg')} style={styles.image} />
       <TextInput
         label="Name"
@@ -88,24 +83,38 @@ export default function RegisterScreen({ navigation }) {
         textContentType="emailAddress"
         keyboardType="email-address"
       />
-      <TextInput
-        label="Password"
-        returnKeyType="done"
-        value={password.value}
-        onChangeText={(text) => setPassword({ value: text, error: '' })}
-        error={!!password.error}
-        errorText={password.error}
-        secureTextEntry
-      />
-      <TextInput
-        label="Confirm Password"
-        returnKeyType="done"
-        value={confirmPassword.value}
-        onChangeText={(text) => setConfirmPassword({ value: text, error: '' })}
-        error={!!confirmPassword.error}
-        errorText={confirmPassword.error}
-        secureTextEntry
-      />
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <TextInput
+          label="Password"
+          returnKeyType="done"
+          value={password.value}
+          onChangeText={(text) => setPassword({ value: text, error: '' })}
+          error={!!password.error}
+          errorText={password.error}
+          secureTextEntry={!showPassword}
+        />
+        <IconButton
+          style={{ marginLeft: -35, zIndex: 1 }}
+          icon={showPassword ? 'eye' : 'eye-off'}
+          onPress={() => setShowPassword(!showPassword)}
+        />
+      </View>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <TextInput
+          label="Confirm Password"
+          returnKeyType="done"
+          value={confirmPassword.value}
+          onChangeText={(text) => setConfirmPassword({ value: text, error: '' })}
+          error={!!confirmPassword.error}
+          errorText={confirmPassword.error}
+          secureTextEntry={!showConfirmPassword}
+        />
+        <IconButton
+          style={{ marginLeft: -35, zIndex: 1 }}
+          icon={showConfirmPassword ? 'eye' : 'eye-off'}
+          onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+        />
+      </View>
       {errorMessage ? <Text style={styles.loginError}>{errorMessage}</Text> : null}
       <Button
         mode="contained"
@@ -116,7 +125,7 @@ export default function RegisterScreen({ navigation }) {
       </Button>
       <View style={styles.row}>
         <Text>Already have an account? </Text>
-        <TouchableOpacity onPress={() =>navigation.navigate('Login', { name: 'Login' })}>
+        <TouchableOpacity onPress={() => navigation.navigate('Login', { name: 'Login' })}>
           <Text style={styles.link}>Login</Text>
         </TouchableOpacity>
       </View>
@@ -125,51 +134,51 @@ export default function RegisterScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: 'plum',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    forgotPassword: {
-      width: '90%',
-      alignItems: 'flex-end',
-      marginBottom: 24,
-    },
-    forgot: {
-      fontSize: 13,
-      color: theme.colors.secondary,
-    },
-    loginError: {
-      fontSize: 15,
-      marginBottom:'3%',
-      color: 'red'
-    },
-    link: {
-      fontWeight: 'bold',
-      color: theme.colors.primary,
-      },
-    row: {
-      padding:20,
-      alignContent:"center", 
-      justifyContent: 'center',
-      textAlign: 'center',
-      flexDirection: 'row',
-      marginTop: 4,
-    },
-    input: {
-        height: 40,
-        margin: 12,
-        borderWidth: 1,
-        padding: 10,
-      },
-    image: {
-        width: 120,
-        height: 120,
-        marginBottom: 20,
-      },
-    wrapper: {
-        borderColor: 'grey',
-        borderWidth: 5, 
-    }
-  });
+  container: {
+    flex: 1,
+    backgroundColor: 'plum',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  forgotPassword: {
+    width: '90%',
+    alignItems: 'flex-end',
+    marginBottom: 24,
+  },
+  forgot: {
+    fontSize: 13,
+    color: theme.colors.secondary,
+  },
+  loginError: {
+    fontSize: 15,
+    marginBottom: '3%',
+    color: 'red'
+  },
+  link: {
+    fontWeight: 'bold',
+    color: theme.colors.primary,
+  },
+  row: {
+    padding: 20,
+    alignContent: "center",
+    justifyContent: 'center',
+    textAlign: 'center',
+    flexDirection: 'row',
+    marginTop: 4,
+  },
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+  },
+  image: {
+    width: 120,
+    height: 120,
+    marginBottom: 20,
+  },
+  wrapper: {
+    borderColor: 'grey',
+    borderWidth: 5,
+  }
+});

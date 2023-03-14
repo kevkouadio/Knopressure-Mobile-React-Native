@@ -11,7 +11,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const uri = process.env.DB_CONNECTION;
+const uri = process.env.DB_CONNECTION || "mongodb://localhost:27017/appDB";
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const UserSchema = new mongoose.Schema({
@@ -59,7 +59,7 @@ app.post('/login', (req, res) => {
             if (!result) return res.status(401).send("Wrong password.");
 
             const token = jwt.sign({ id: user._id }, secret, { expiresIn: '24h' });
-            //res.header('auth-token', token);
+            res.header('auth-token', token);
             res.status(200).json({ token });
         });
     });
@@ -67,17 +67,25 @@ app.post('/login', (req, res) => {
 
 app.post('/refreshToken', (req, res) => {
     jwt.verify(req.body.token, secret, (err, decoded) => {
-      if (err) return res.status(401).send("Token is invalid.");
+      if (err) {
+        if (err.name === 'TokenExpiredError') {
+          const userId = jwt.decode(req.body.token).id;
+          User.findById(userId, (err, user) => {
+            if (err) return res.status(500).send(err);
+            if (!user) return res.status(404).send("User not found.");
   
-      User.findById(decoded.id, (err, user) => {
-        if (err) return res.status(500).send(err);
-        if (!user) return res.status(404).send("User not found.");
-  
-        const newToken = jwt.sign({ id: user._id }, secret, { expiresIn: '24h' });
-        res.status(200).json({ token: newToken });
-      });
+            const newToken = jwt.sign({ id: user._id }, secret, { expiresIn: '24h' });
+            res.status(200).json({ token: newToken });
+          });
+        } else {
+          return res.status(401).send("Token is invalid.");
+        }
+      } else {
+        res.status(200).json({ token: req.body.token });
+      }
     });
-  });  
+  });
+    
 
 app.get('/users', (req, res) => {
     User.find({}, (err, users) => {

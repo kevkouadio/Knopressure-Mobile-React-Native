@@ -31,22 +31,28 @@ export default function ChartScreen() {
   const systolicData = bpData.map(data => data.Systolic);
   const diastolicData = bpData.map(data => data.Diastolic);
 
-  // const renderItem = ({ item }) => (
-  //   <View style={styles.rowContainer}>
-  //     <Text style={styles.dateText}>{item.date}</Text>
-  //     <Text style={styles.systolicText}>{item.Systolic}</Text>
-  //     <Text style={styles.diastolicText}>{item.Diastolic}</Text>
-  //   </View>
-  // );
-
   if (screenOrientation === 'portrait') {
+    
     return (
       <View style={styles.TableContainer}>
+        <Text>Put your device in landscape mode to view your chart.</Text>
         <Table borderStyle={{ borderWidth: 2, borderColor: '#c8e1ff' }}>
-          <Row data={['Date', 'Systolic', 'Diastolic']} style={styles.head} textStyle={styles.head} />
-          {bpData.map(data => (
-            <Row key={data._id} data={[data.date, data.Systolic, data.Diastolic]} textStyle={styles.text} />
-          ))}
+          <Row data={['Date', 'Systolic', 'Diastolic']} textStyle={styles.head}  />
+          {bpData.map(data => (           
+              <Row
+                key={data._id}
+                data={[
+                  new Date(data.date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit"
+                  }),
+                  data.Systolic,
+                  data.Diastolic
+                ]}
+                textStyle={styles.text}
+              />
+            ))}
         </Table>
       </View>
     );

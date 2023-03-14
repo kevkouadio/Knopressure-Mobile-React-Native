@@ -10,11 +10,13 @@ import { passwordValidator } from '../helpers/passwordValidator'
 import { login, getUserProfile } from '../service' //import the service
 //import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as SecureStore from 'expo-secure-store';
+import { IconButton } from 'react-native-paper';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState({ value: '', error: '' })
   const [password, setPassword] = useState({ value: '', error: '' })
   const [errorMessage, setErrorMessage] = useState()
+  const [showPassword, setShowPassword] = useState(false);
 
   const onLoginPressed = async () => {
     const emailError = emailValidator(email.value)
@@ -67,6 +69,7 @@ export default function LoginScreen({ navigation }) {
         textContentType="emailAddress"
         // keyboardType="email-address"
       />
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <TextInput
         label="Password"
         returnKeyType="done"
@@ -74,8 +77,14 @@ export default function LoginScreen({ navigation }) {
         onChangeText={(text) => setPassword({ value: text, error: '' })}
         error={!!password.error}
         errorText={password.error}
-        secureTextEntry
+        secureTextEntry={!showPassword}
       />
+      <IconButton 
+        style={{ marginLeft: -35, zIndex:1}}
+        icon={showPassword ? 'eye' : 'eye-off'}
+        onPress={() => setShowPassword(!showPassword)}
+      />
+      </View>
       {errorMessage ? <Text style={styles.loginError}>{errorMessage}</Text> : null}
       <View style={styles.forgotPassword}>
         <TouchableOpacity

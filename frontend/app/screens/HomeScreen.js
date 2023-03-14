@@ -4,6 +4,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import TipsScreen from './TipsScreen';
 import ChartScreen from './ChartScreen';
+import ProfileScreen from './ProfileScreen';
 import { theme } from '../core/theme'
 import Header from '../components/Header'
 import TextInput from '../components/TextInput'
@@ -29,18 +30,6 @@ function HomeScreen({ navigation, userId }) {
       });
   }, [userId]);
 
-  const logout = async () => {
-    try {
-      await SecureStore.deleteItemAsync('token');
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Landing' }],
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const createNewBpData = async () => {
     try {
       const bpData = {
@@ -61,9 +50,6 @@ function HomeScreen({ navigation, userId }) {
   return (
     <>
       <View style={styles.container}>
-        <Button title="Home" style={styles.LogoutButton} onPress={logout}>
-          logout
-        </Button>
         <Header>
           Welcome {user.username}
         </Header>
@@ -95,10 +81,11 @@ function HomeScreen({ navigation, userId }) {
         </View>
         {/* <Tables />  */}
         <Text>Understanding Blood Pressure Readings</Text>
-        <Image
+        <Tables />
+        {/* <Image
           source={require('../assets/blood-pressure-readings-chart.jpg')}
           style={styles.image}
-        />
+        /> */}
 
         <Button style={styles.Button} mode="contained" onPress={createNewBpData} disabled={!(systolic.value && diastolic)}>
           Submit your numbers
@@ -115,7 +102,7 @@ export default function HomeTabs() {
       activeColor="#e91e63"
       barStyle={{ backgroundColor: 'tomato' }}
     >
-      <Tab.Screen name="Profile" component={HomeScreen}
+      <Tab.Screen name="Home" component={HomeScreen}
         options={{
           tabBarLabel: 'Home',
           tabBarIcon: ({ color }) => (
@@ -143,6 +130,18 @@ export default function HomeTabs() {
           headerShown: false
         }}
       />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          tabBarLabel: 'Profile',
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="account" color={color} size={26} />
+          ),
+          headerShown: false
+        }}
+      />
+
     </Tab.Navigator>
   );
 }
